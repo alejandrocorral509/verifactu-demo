@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo VeriFactu</title>
+<meta name="description" content="Demo de facturación VeriFactu: huella SHA-256 encadenada, anulaciones, verificación de la cadena y QR tributario según las especificaciones de la AEAT.">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="verifactu.js"></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Demo VeriFactu</h1>
+    <p class="sub">Facturación con huella encadenada y QR tributario, según las especificaciones técnicas de la AEAT.</p>
+  </div>
+  <span id="autotest" class="badge">Comprobando ejemplos oficiales…</span>
+</header>
+
+<main class="grid">
+  <!-- 1. Emitir factura -->
+  <section class="card" aria-labelledby="t-nueva">
+    <h2 id="t-nueva"><span class="step">1</span> Emitir factura</h2>
+    <form id="form-factura" novalidate>
+      <div class="row">
+        <label>NIF del emisor
+          <input name="nif" value="89890001K" maxlength="9" autocomplete="off" required>
+        </label>
+        <label>Serie
+          <input name="serie" value="T2026" maxlength="20" required>
+        </label>
+      </div>
+      <div class="row">
+        <label>Fecha de expedición
+          <input name="fecha" type="date" required>
+        </label>
+        <label>Tipo de factura
+          <select name="tipo">
+            <option value="F2">F2 · Simplificada (ticket)</option>
+            <option value="F1">F1 · Completa</option>
+          </select>
+        </label>
+      </div>
+
+      <table class="lineas">
+        <thead><tr><th>Concepto</th><th>Uds.</th><th>Precio sin IVA</th><th>IVA</th><th></th></tr></thead>
+        <tbody id="lineas"></tbody>
+      </table>
+      <button type="button" class="link" id="add-linea">+ Añadir línea</button>
+
+      <dl class="totales">
+        <dt>Base imponible</dt><dd id="t-base">0,00 €</dd>
+        <dt>Cuota IVA</dt><dd id="t-cuota">0,00 €</dd>
+        <dt class="total">Importe total</dt><dd class="total" id="t-total">0,00 €</dd>
+      </dl>
+      <p id="form-errores" class="error" role="alert"></p>
+      <button type="submit" class="primary">Emitir y registrar</button>
+    </form>
+  </section>
+
+  <!-- 2. Cadena de registros -->
+  <section class="card wide" aria-labelledby="t-cadena">
+    <div class="card-head">
+      <h2 id="t-cadena"><span class="step">2</span> Registros de facturación</h2>
+      <div class="actions">
+        <button type="button" id="verificar" class="primary">Verificar cadena</button>
+        <button type="button" id="ejemplo">Cargar ejemplo</button>
+        <button type="button" id="borrar" class="ghost">Borrar todo</button>
+      </div>
+    </div>
+    <p class="hint">Cada registro guarda la huella del anterior. Si alguien cambia un dato después, la cadena deja de cuadrar.</p>
+    <p id="resumen-verificacion" class="resumen" role="status"></p>
+    <ol id="cadena" class="cadena"></ol>
+    <p id="vacio" class="vacio">Aún no hay registros. Emite una factura o carga el ejemplo.</p>
+
+    <details class="fraude">
+      <summary>Simular una manipulación</summary>
+      <p class="hint">Así se ve lo que VeriFactu impide: rebajar el importe de una factura ya emitida.
+        Si manipulas el último registro y recalculas su huella, la cadena local cuadra. Por eso VeriFactu envía cada registro a la AEAT al momento: Hacienda ya tiene la huella original.</p>
+      <div class="row">
+        <label>Registro
+          <select id="fraude-registro"></select>
+        </label>
+      </div>
+      <div class="actions">
+        <button type="button" id="fraude-a">Rebajar importe un 50 %</button>
+        <button type="button" id="fraude-b">Rebajar importe y recalcular su huella</button>
+      </div>
+    </details>
+  </section>
+
+  <!-- 3. Factura con QR -->
+  <section class="card" aria-labelledby="t-factura">
+    <h2 id="t-factura"><span class="step">3</span> Factura emitida</h2>
+    <div id="factura" class="factura-vacia">Selecciona «Ver» en un registro.</div>
+  </section>
+</main>
+
+<footer class="pie">
+  Proyecto de aprendizaje de Alejandro Corral. Usa el entorno de <strong>pruebas</strong> de la AEAT y el NIF de pruebas 89890001K.
+  No envía nada a Hacienda ni es un sistema certificado.
+</footer>
+</body>
+</html>

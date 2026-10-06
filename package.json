@@ -1,0 +1,10 @@
+{
+  "name": "verifactu-demo",
+  "version": "1.0.0",
+  "description": "Demo de facturación VeriFactu: huella SHA-256 encadenada y QR tributario",
+  "scripts": {
+    "start": "npx serve .",
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
